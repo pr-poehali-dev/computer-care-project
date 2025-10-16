@@ -3,11 +3,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -397,19 +401,82 @@ const Index = () => {
                 <CardTitle>Напишите мне</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Input placeholder="Ваше имя" />
-                </div>
-                <div>
-                  <Input type="email" placeholder="Email" />
-                </div>
-                <div>
-                  <Textarea placeholder="Ваше сообщение" rows={4} />
-                </div>
-                <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
-                  Отправить сообщение
-                  <Icon name="Send" size={18} className="ml-2" />
-                </Button>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setIsSubmitting(true);
+
+                  try {
+                    const response = await fetch('https://functions.poehali.dev/d7dde0d3-a42d-442c-8306-6726922c25a4', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify(formData),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                      toast({
+                        title: "Сообщение отправлено!",
+                        description: "Я свяжусь с вами в ближайшее время.",
+                      });
+                      setFormData({ name: '', email: '', message: '' });
+                    } else {
+                      toast({
+                        title: "Ошибка отправки",
+                        description: data.error || "Попробуйте позже или свяжитесь по телефону",
+                        variant: "destructive",
+                      });
+                    }
+                  } catch (error) {
+                    toast({
+                      title: "Ошибка сети",
+                      description: "Проверьте подключение к интернету",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}>
+                  <div className="space-y-4">
+                    <div>
+                      <Input 
+                        placeholder="Ваше имя" 
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Input 
+                        type="email" 
+                        placeholder="Email" 
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Textarea 
+                        placeholder="Ваше сообщение" 
+                        rows={4} 
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        required
+                        minLength={10}
+                      />
+                    </div>
+                    <Button 
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity disabled:opacity-50"
+                    >
+                      {isSubmitting ? 'Отправка...' : 'Отправить сообщение'}
+                      <Icon name="Send" size={18} className="ml-2" />
+                    </Button>
+                  </div>
+                </form>
               </CardContent>
             </Card>
           </div>
