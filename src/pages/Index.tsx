@@ -201,11 +201,14 @@ const Index = () => {
 
             <div className="relative animate-scale-in">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl blur-3xl"></div>
-              <img
-                src="https://cdn.poehali.dev/files/750f1f1e-9f13-45af-aa9d-4a83d87660c2.png"
-                alt="IT специалист"
-                className="relative rounded-3xl shadow-2xl w-full h-auto object-cover animate-float"
-              />
+              <div className="relative rounded-3xl shadow-2xl overflow-hidden animate-float">
+                <img
+                  src="https://cdn.poehali.dev/projects/66eceb78-8a96-45ae-a1d8-278d476ca3c5/files/ca47159a-b3f2-4a6f-bb75-6687727f1af0.jpg"
+                  alt="Офис IT специалиста"
+                  className="w-full h-auto object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              </div>
             </div>
           </div>
         </div>
